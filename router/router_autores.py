@@ -6,27 +6,32 @@ from sqlmodel import Session
 
 router = APIRouter(prefix="/autores", tags=["Autores"])
 
+
 @router.post("/", response_model=Autor, status_code=status.HTTP_201_CREATED)
 def crear(new_autor: AutorCreate):
     with Session(engine) as session:
         return crud.crear_autor(session, new_autor)
 
+
 @router.get("/", response_model=list[Autor])
-def listar(nacionalidad: str = None):
+def listar(pais_origen: str = None):
     with Session(engine) as session:
-        return crud.listar_autores(session, nacionalidad)
+        return crud.listar_autores(session, pais_origen)
+
 
 @router.get("/{id_autor}", response_model=Autor)
 def obtener(id_autor: int):
     with Session(engine) as session:
         return crud.obtener_autor(session, id_autor)
 
+
 @router.patch("/{id_autor}", response_model=Autor)
 def actualizar(id_autor: int, datos: AutorUpdate):
     with Session(engine) as session:
         return crud.actualizar_autor(session, id_autor, datos)
 
-@router.delete("/{id_autor}")
+
+@router.delete("/{id_autor}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar(id_autor: int):
     with Session(engine) as session:
         return crud.eliminar_autor(session, id_autor)

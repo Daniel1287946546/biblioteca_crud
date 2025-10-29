@@ -2,6 +2,9 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, select
 from models import Libro, LibroCreate, LibroUpdate, Autor, AutorCreate, AutorUpdate
 
+# =========================================================
+# CRUD DE LIBROS
+# =========================================================
 
 def crear_libro(session: Session, new_libro: LibroCreate):
     libro = Libro.from_orm(new_libro)
@@ -10,19 +13,22 @@ def crear_libro(session: Session, new_libro: LibroCreate):
     session.refresh(libro)
     return libro
 
+
 def listar_libros(session: Session, genero: str = None, codigo: int = None):
     query = select(Libro)
     if genero:
         query = query.where(Libro.genero == genero)
     if codigo:
-        query = query.where(Libro.id == codigo)
+        query = query.where(Libro.codigo == codigo)
     return session.exec(query).all()
+
 
 def obtener_libro(session: Session, libro_id: int):
     libro = session.get(Libro, libro_id)
     if not libro:
         raise HTTPException(status_code=404, detail="Libro no encontrado")
     return libro
+
 
 def actualizar_libro(session: Session, libro_id: int, datos: LibroUpdate):
     libro = session.get(Libro, libro_id)
@@ -36,6 +42,7 @@ def actualizar_libro(session: Session, libro_id: int, datos: LibroUpdate):
     session.refresh(libro)
     return libro
 
+
 def eliminar_libro(session: Session, libro_id: int):
     libro = session.get(Libro, libro_id)
     if not libro:
@@ -43,6 +50,7 @@ def eliminar_libro(session: Session, libro_id: int):
     session.delete(libro)
     session.commit()
     return {"message": "Libro eliminado exitosamente"}
+
 
 def autor_del_libro(session: Session, libro_id: int):
     libro = session.get(Libro, libro_id)
@@ -54,6 +62,10 @@ def autor_del_libro(session: Session, libro_id: int):
     return autor
 
 
+# =========================================================
+# CRUD DE AUTORES
+# =========================================================
+
 def crear_autor(session: Session, new_autor: AutorCreate):
     autor = Autor.from_orm(new_autor)
     session.add(autor)
@@ -61,17 +73,20 @@ def crear_autor(session: Session, new_autor: AutorCreate):
     session.refresh(autor)
     return autor
 
-def listar_autores(session: Session, nacionalidad: str = None):
+
+def listar_autores(session: Session, pais_origen: str = None):
     query = select(Autor)
-    if nacionalidad:
-        query = query.where(Autor.nacionalidad == nacionalidad)
+    if pais_origen:
+        query = query.where(Autor.pais_origen == pais_origen)
     return session.exec(query).all()
+
 
 def obtener_autor(session: Session, autor_id: int):
     autor = session.get(Autor, autor_id)
     if not autor:
         raise HTTPException(status_code=404, detail="Autor no encontrado")
     return autor
+
 
 def actualizar_autor(session: Session, autor_id: int, datos: AutorUpdate):
     autor = session.get(Autor, autor_id)
@@ -85,6 +100,7 @@ def actualizar_autor(session: Session, autor_id: int, datos: AutorUpdate):
     session.refresh(autor)
     return autor
 
+
 def eliminar_autor(session: Session, autor_id: int):
     autor = session.get(Autor, autor_id)
     if not autor:
@@ -92,3 +108,10 @@ def eliminar_autor(session: Session, autor_id: int):
     session.delete(autor)
     session.commit()
     return {"message": "Autor eliminado exitosamente"}
+
+
+def libros_de_autor(session: Session, autor_id: int):
+    autor = session.get(Autor, autor_id)
+    if not autor:
+        raise HTTPException(status_code=404, detail="Autor no encontrado")
+    return autor.libros
