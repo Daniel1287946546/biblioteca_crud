@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, create_engine, Session
 
-# Base de datos SQLite (se creará automáticamente en el proyecto)
+
 DATABASE_URL = "sqlite:///biblioteca.db"
 
 engine = create_engine(DATABASE_URL, echo=False)
