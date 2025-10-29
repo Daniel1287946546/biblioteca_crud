@@ -3,10 +3,12 @@ from typing import Optional, List
 
 
 class LibroBase(SQLModel):
-    codigo: int = Field(description="Código único del libro")
+    ISBN: int = Field(description="Número ISBN del libro")
     titulo: str
     genero: str
     editorial: Optional[str] = None
+    numero_copias: int = Field(default=1, description="Cantidad de copias disponibles")
+    año_publicacion: int = Field(description="Año de publicación del libro")
 
 
 class Libro(LibroBase, table=True):
@@ -20,11 +22,14 @@ class LibroCreate(LibroBase):
 
 
 class LibroUpdate(SQLModel):
-    codigo: Optional[int] = None
+    ISBN: Optional[int] = None
     titulo: Optional[str] = None
     genero: Optional[str] = None
     editorial: Optional[str] = None
+    numero_copias: Optional[int] = None
+    año_publicacion: Optional[int] = None
     autor_id: Optional[int] = None
+
 
 
 class AutorBase(SQLModel):
@@ -35,7 +40,7 @@ class AutorBase(SQLModel):
 
 class Autor(AutorBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    libros: List[Libro] = Relationship(back_populates="autor")
+    libros: List["Libro"] = Relationship(back_populates="autor")
 
 
 class AutorCreate(AutorBase):
