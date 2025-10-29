@@ -8,13 +8,16 @@ class LibroBase(SQLModel):
     genero: str
     editorial: Optional[str] = None
 
+
 class Libro(LibroBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     autor_id: Optional[int] = Field(default=None, foreign_key="autor.id")
     autor: Optional["Autor"] = Relationship(back_populates="libros")
 
+
 class LibroCreate(LibroBase):
     autor_id: Optional[int] = None
+
 
 class LibroUpdate(SQLModel):
     codigo: Optional[int] = None
@@ -23,19 +26,23 @@ class LibroUpdate(SQLModel):
     editorial: Optional[str] = None
     autor_id: Optional[int] = None
 
+
 class AutorBase(SQLModel):
     nombre: str
-    nacionalidad: str
-    edad: Optional[int] = None
+    pais_origen: str
+    año_nacimiento: int
+
 
 class Autor(AutorBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     libros: List[Libro] = Relationship(back_populates="autor")
 
+
 class AutorCreate(AutorBase):
     pass
 
+
 class AutorUpdate(SQLModel):
     nombre: Optional[str] = None
-    nacionalidad: Optional[str] = None
-    edad: Optional[int] = None
+    pais_origen: Optional[str] = None
+    año_nacimiento: Optional[int] = None
