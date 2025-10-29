@@ -1,18 +1,25 @@
 from fastapi import FastAPI
-from database import create_db_and_tables
-from routers import authors, books
+from sqlmodel import SQLModel
+from database import engine
+from router import router_libros, router_autores
 
-app = FastAPI(title="Sistema de Gestión de Biblioteca")
+app = FastAPI(
+    title="Sistema de Gestión de Biblioteca",
+    description="API para gestionar libros y autores en la biblioteca",
+    version="1.0.0"
+)
 
-# Crear tablas al iniciar el servidor
+# Crear las tablas en la base de datos
 @app.on_event("startup")
 def on_startup():
-    create_db_and_tables()
+    SQLModel.metadata.create_all(engine)
 
-# Rutas principales
-app.include_router(authors.router)
-app.include_router(books.router)
+# Routers
+app.include_router(router_libros.router)
+app.include_router(router_autores.router)
 
+# Ruta base de prueba
 @app.get("/")
 def root():
-    return {"message": "Bienvenido al sistema de gestión de biblioteca 📚"}
+    return {"message": "Bienvenido al Sistema de Biblioteca 📚"}
+
