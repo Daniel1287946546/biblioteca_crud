@@ -1,25 +1,41 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 
-# ---------- MODELO AUTOR ----------
-class AuthorBase(SQLModel):
-    name: str
-    country: str
-    birth_year: int
 
-class Author(AuthorBase, table=True):
+class LibroBase(SQLModel):
+    codigo: int = Field(description="Código único del libro")
+    titulo: str
+    genero: str
+    editorial: Optional[str] = None
+
+class Libro(LibroBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    books: List["Book"] = Relationship(back_populates="author", cascade_delete=True)
+    autor_id: Optional[int] = Field(default=None, foreign_key="autor.id")
+    autor: Optional["Autor"] = Relationship(back_populates="libros")
 
+class LibroCreate(LibroBase):
+    autor_id: Optional[int] = None
 
-# ---------- MODELO LIBRO ----------
-class BookBase(SQLModel):
-    title: str
-    isbn: str
-    year: int
-    copies: int  # número de copias disponibles
+class LibroUpdate(SQLModel):
+    codigo: Optional[int] = None
+    titulo: Optional[str] = None
+    genero: Optional[str] = None
+    editorial: Optional[str] = None
+    autor_id: Optional[int] = None
 
-class Book(BookBase, table=True):
+class AutorBase(SQLModel):
+    nombre: str
+    nacionalidad: str
+    edad: Optional[int] = None
+
+class Autor(AutorBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    author_id: Optional[int] = Field(default=None, foreign_key="author.id")
-    author: Optional[Author] = Relationship(back_populates="books")
+    libros: List[Libro] = Relationship(back_populates="autor")
+
+class AutorCreate(AutorBase):
+    pass
+
+class AutorUpdate(SQLModel):
+    nombre: Optional[str] = None
+    nacionalidad: Optional[str] = None
+    edad: Optional[int] = None
