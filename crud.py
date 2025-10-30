@@ -11,10 +11,9 @@ def crear_libro(session: Session, new_libro: LibroCreate):
     return libro
 
 
-# Ahora listar_libros filtra solo por año
-def listar_libros(session: Session, año: int):
+def listar_libros(session: Session, anio: int):
     query = select(Libro)
-    query = query.where(Libro.año == año)  # filtrado solo por año
+    query = query.where(Libro.anio_publicacion == anio)  # filtrado solo por año
 
     libros = session.exec(query).all()
     if not libros:
