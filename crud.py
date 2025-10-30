@@ -4,10 +4,6 @@ from sqlalchemy.exc import IntegrityError
 from models import Libro, LibroCreate, LibroUpdate, Autor, AutorCreate, AutorUpdate
 
 
-# =============================
-# 📚 CRUD LIBROS
-# =============================
-
 def crear_libro(session: Session, new_libro: LibroCreate):
     libro = Libro.from_orm(new_libro)
     session.add(libro)
@@ -80,9 +76,6 @@ def autor_del_libro(session: Session, libro_id: int):
     return autor
 
 
-# =============================
-# ✍️ CRUD AUTORES
-# =============================
 
 def crear_autor(session: Session, new_autor: AutorCreate):
     autor = Autor.from_orm(new_autor)

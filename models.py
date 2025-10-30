@@ -1,10 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 
-
-# ==============================
-# 📘 MODELO DE LIBROS
-# ==============================
 class LibroBase(SQLModel):
     ISBN: int = Field(description="Número ISBN del libro", unique=True, index=True)
     titulo: str

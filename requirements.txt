@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+sqlmodel
+sqlalchemy
+pydantic
+typing-extensions
