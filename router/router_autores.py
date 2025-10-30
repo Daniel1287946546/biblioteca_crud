@@ -6,17 +6,10 @@ from sqlmodel import Session
 
 router = APIRouter(prefix="/autores", tags=["Autores"])
 
-
 @router.post("/", response_model=Autor, status_code=status.HTTP_201_CREATED)
 def crear(new_autor: AutorCreate):
     with Session(engine) as session:
         return crud.crear_autor(session, new_autor)
-
-
-@router.get("/", response_model=list[Autor])
-def listar(pais_origen: str = None):
-    with Session(engine) as session:
-        return crud.listar_autores(session, pais_origen)
 
 
 @router.get("/{id_autor}", response_model=Autor)

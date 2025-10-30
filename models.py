@@ -1,9 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 
-# =========================
-# MODELOS DE LIBRO
-# =========================
 
 class LibroBase(SQLModel):
     ISBN: int = Field(description="Número ISBN del libro")
@@ -11,7 +8,7 @@ class LibroBase(SQLModel):
     genero: str
     editorial: Optional[str] = None
     numero_copias: int = Field(default=1, description="Cantidad de copias disponibles")
-    anio_publicacion: int = Field(description="Año de publicación del libro")  # Cambié año_publicacion para evitar ñ
+    anio_publicacion: int = Field(description="Año de publicación del libro") 
 
 class Libro(LibroBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
