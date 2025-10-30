@@ -3,8 +3,6 @@ from sqlmodel import Session, select
 from models import Libro, LibroCreate, LibroUpdate, Autor, AutorCreate, AutorUpdate
 
 
-# ---------------------- LIBROS ----------------------
-
 def crear_libro(session: Session, new_libro: LibroCreate):
     libro = Libro.from_orm(new_libro)
     session.add(libro)
@@ -13,16 +11,14 @@ def crear_libro(session: Session, new_libro: LibroCreate):
     return libro
 
 
-def listar_libros(session: Session, genero: str = None, ISBN: str = None):
+# Ahora listar_libros filtra solo por año
+def listar_libros(session: Session, año: int):
     query = select(Libro)
-    if genero:
-        query = query.where(Libro.genero == genero)
-    if ISBN:
-        query = query.where(Libro.ISBN == ISBN)  # corregido desde 'codigo'
+    query = query.where(Libro.año == año)  # filtrado solo por año
 
     libros = session.exec(query).all()
     if not libros:
-        raise HTTPException(status_code=404, detail="No se encontraron libros con esos filtros")
+        raise HTTPException(status_code=404, detail="No se encontraron libros para ese año")
     return libros
 
 
@@ -63,8 +59,6 @@ def autor_del_libro(session: Session, libro_id: int):
         raise HTTPException(status_code=404, detail="Autor no encontrado")
     return autor
 
-
-# ---------------------- AUTORES ----------------------
 
 def crear_autor(session: Session, new_autor: AutorCreate):
     autor = Autor.from_orm(new_autor)
