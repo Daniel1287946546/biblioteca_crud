@@ -1,19 +1,31 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
+from sqlalchemy.exc import IntegrityError
 from models import Libro, LibroCreate, LibroUpdate, Autor, AutorCreate, AutorUpdate
 
+
+# =============================
+# 📚 CRUD LIBROS
+# =============================
 
 def crear_libro(session: Session, new_libro: LibroCreate):
     libro = Libro.from_orm(new_libro)
     session.add(libro)
-    session.commit()
-    session.refresh(libro)
-    return libro
+    try:
+        session.commit()
+        session.refresh(libro)
+        return libro
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El ISBN ya está registrado. Debe ser único."
+        )
 
 
 def listar_libros(session: Session, anio: int):
     query = select(Libro)
-    query = query.where(Libro.anio_publicacion == anio)  # filtrado solo por año
+    query = query.where(Libro.anio_publicacion == anio)
 
     libros = session.exec(query).all()
     if not libros:
@@ -32,12 +44,21 @@ def actualizar_libro(session: Session, libro_id: int, datos: LibroUpdate):
     libro = session.get(Libro, libro_id)
     if not libro:
         raise HTTPException(status_code=404, detail="Libro no encontrado")
+
     for key, value in datos.dict(exclude_unset=True).items():
         setattr(libro, key, value)
-    session.add(libro)
-    session.commit()
-    session.refresh(libro)
-    return libro
+
+    try:
+        session.add(libro)
+        session.commit()
+        session.refresh(libro)
+        return libro
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El ISBN ingresado ya pertenece a otro libro."
+        )
 
 
 def eliminar_libro(session: Session, libro_id: int):
@@ -58,6 +79,10 @@ def autor_del_libro(session: Session, libro_id: int):
         raise HTTPException(status_code=404, detail="Autor no encontrado")
     return autor
 
+
+# =============================
+# ✍️ CRUD AUTORES
+# =============================
 
 def crear_autor(session: Session, new_autor: AutorCreate):
     autor = Autor.from_orm(new_autor)
@@ -89,8 +114,10 @@ def actualizar_autor(session: Session, autor_id: int, datos: AutorUpdate):
     autor = session.get(Autor, autor_id)
     if not autor:
         raise HTTPException(status_code=404, detail="Autor no encontrado")
+
     for key, value in datos.dict(exclude_unset=True).items():
         setattr(autor, key, value)
+
     session.add(autor)
     session.commit()
     session.refresh(autor)
@@ -111,5 +138,5 @@ def libros_de_autor(session: Session, autor_id: int):
     if not autor:
         raise HTTPException(status_code=404, detail="Autor no encontrado")
     if not autor.libros:
-        raise HTTPException(status_code=404, detail="El autor no tiene libros")
+        raise HTTPException(status_code=404, detail="El autor no tiene libros registrados")
     return autor.libros
